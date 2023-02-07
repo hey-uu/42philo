@@ -6,13 +6,13 @@
 #    By: hyeyukim <hyeyukim@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/05 11:45:28 by hyeyukim          #+#    #+#              #
-#    Updated: 2023/02/07 16:05:31 by hyeyukim         ###   ########.fr        #
+#    Updated: 2023/02/07 16:06:48 by hyeyukim         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 NAME_BONUS = philo_bonus
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := bonus
 
 # **************************** command and flags ***************************** #
 
@@ -47,19 +47,19 @@ BON_DIR					=		philo_bonus
 # ******************************* header files ******************************* #
 
 # directory path
-MAN_INC_PATH			=		$(INC_DIR)
+BON_INC_PATH			=		$(INC_DIR)
 
 # flags
-MAN_INC_FLAG			=		-I./$(MAN_INC_PATH)
+BON_INC_FLAG			=		-I./$(BON_INC_PATH)
 
 # ******************************* object files ******************************* #
 
 # directory path
-MAN_OBJ_PATH			=		./$(OBJ_DIR)
-BON_OBJ_PATH			=		../$(BON_DIR)/$(OBJ_DIR)
-MAN_SRC_PATH			=		./$(SRC_DIR)
+BON_OBJ_PATH			=		./$(OBJ_DIR)
+MAN_OBJ_PATH			=		../$(MAN_DIR)/$(OBJ_DIR)
+BON_SRC_PATH			=		./$(SRC_DIR)
 
-MAN_FILE				=		error\
+BON_FILE				=		error\
 								init\
 								main\
 								monitor\
@@ -70,21 +70,22 @@ MAN_FILE				=		error\
 								philo_utils
 
 # file name(absolute path)
-MAN_OBJ					=		$(addprefix $(MAN_OBJ_PATH)/, $(addsuffix .o, $(MAN_FILE)))
+BON_OBJ					=		$(addprefix $(BON_OBJ_PATH)/, $(addsuffix .o, $(BON_FILE)))
 
 # ****************************** dependency files ***************************** #
 
-MAN_DEP					=		$(MAN_OBJ:.o=.d)
+BON_DEP					=		$(BON_OBJ:.o=.d)
 
 # ******************************* basic rules ******************************** #
 
 .PHONY : all bonus
 all : $(NAME)
-$(NAME) : $(MAN_OBJ)
-	$(CC) -pthread $(CFLAGS) $(MAN_OBJ) $(LIBFLAGS) -o $@
+$(NAME) :
+	make -C ../$(MAN_DIR);
 
-bonus :
-	make -C ../philo_bonus bonus
+bonus : $(NAME_BONUS)
+$(NAME_BONUS) : $(BON_OBJ)
+	$(CC) -pthread $(CFLAGS) $(BON_OBJ) $(LIBFLAGS) -o $@
 
 .PHONY : clean fclean re
 clean :
@@ -92,11 +93,11 @@ clean :
 	$(RM) $(RMFLAGS2) $(BON_OBJ_PATH)
 
 fclean : clean
-	$(RM) $(RMFLAGS1) $(NAME) ../$(BON_DIR)/$(NAME_BONUS)
+	$(RM) $(RMFLAGS1) $(NAME_BONUS) ../$(MAN_DIR)/$(NAME)
 
 re :
 	make fclean
-	make all
+	make
 
 # ******************************* assist rules ******************************* #
 
@@ -110,14 +111,14 @@ fsanitize :
 ifeq ($(MAKECMDGOALS), fclean)
 else ifeq ($(MAKECMDGOALS), clean)
 else
-	-include $(MAN_DEP)
+	-include $(BON_DEP)
 endif
 
 # ****************************** compile rules ******************************* #
 
 # mandatory
-$(MAN_OBJ_PATH)/%.o : $(MAN_SRC_PATH)/%.c
-	@mkdir -p $(MAN_OBJ_PATH)
-	$(CC) -c -pthread $(CFLAGS) $< $(MAN_INC_FLAG) -o $@
+$(BON_OBJ_PATH)/%.o : $(BON_SRC_PATH)/%.c
+	@mkdir -p $(BON_OBJ_PATH)
+	$(CC) -c -pthread $(CFLAGS) $< $(BON_INC_FLAG) -o $@
 
 
